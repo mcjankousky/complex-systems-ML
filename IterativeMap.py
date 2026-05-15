@@ -7,6 +7,7 @@ Created on Mon May  4 17:51:59 2026
 
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import cm
 
 class IterativeMap:
     """
@@ -55,6 +56,19 @@ class IterativeMap:
         plt.tight_layout()
         return f_s
         
+    def state_plot(self,func,state_domain,param_domain,k,npts=50):
+        s = np.linspace(state_domain[0],state_domain[1],num=npts)
+        a = np.linspace(param_domain[0],param_domain[1],num=npts)
+        S,A = np.meshgrid(s,a);
+        S0 = S
+        idx = 0
+        while idx < k:
+            S = func(S,A)
+            idx += 1
+        fig,ax = plt.subplots(subplot_kw={"projection":"3d"})
         
-    
+        surf = ax.plot_surface(S0,A,S,cmap=cm.plasma_r)
+        ax.set_xlabel('s0')
+        ax.set_ylabel('a')
+        ax.set_zlabel('s({})'.format(k))
     
