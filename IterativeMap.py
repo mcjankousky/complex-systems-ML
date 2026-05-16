@@ -41,18 +41,28 @@ class IterativeMap:
     def identity_map(self,state):
         return state
         
-    def iterative_plot(self,func,state,k_max,*args):
+    def iterative_plot(self,func,state,k_max,n_composition,*args):
         s_vs_t = self.iterate(func,state,k_max,*args)
         s0_range = np.linspace(0,1)
         f_s = [func(state,*args) for state in s0_range]
-        f2_s = [func(func(state,*args),*args) for state in s0_range]
+        idx = 0
+        s_tmp = s0_range
+        while idx < n_composition:
+            s_tmp = [func(state,*args) for state in s_tmp]
+            idx += 1
         
         fig,ax = plt.subplots(1,3)
         ax[0].scatter([t for t in range(k_max)],s_vs_t)
         ax[1].plot(s0_range,s0_range)
         ax[1].plot(s0_range,f_s)
         ax[2].plot(s0_range,s0_range)
-        ax[2].plot(s0_range,f2_s)
+        ax[2].plot(s0_range,s_tmp)
+        ax[0].set_xlabel('t')
+        ax[0].set_ylabel('s')
+        ax[1].set_xlabel('s')
+        ax[1].set_ylabel('f(s)')
+        ax[2].set_xlabel('s')
+        ax[2].set_ylabel(r'$ f^{{{}}}(s) $'.format(n_composition))
         plt.tight_layout()
         return f_s
         
