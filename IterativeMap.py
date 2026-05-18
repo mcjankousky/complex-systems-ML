@@ -19,6 +19,7 @@ class IterativeMap:
         self.mixing_alpha = mixing_alpha
         
         
+        
     def quadratic_map(self,state,scaling_param):
         return scaling_param*state*(1-state)
     
@@ -37,12 +38,14 @@ class IterativeMap:
             idx += 1
             
         return state_lst
+    
             
     def identity_map(self,state):
         return state
         
-    def iterative_plot(self,func,state,k_max,n_composition,*args):
+    def iterative_plot(self,func,state,k_max,n_composition,*args,noise_scale=0):
         s_vs_t = self.iterate(func,state,k_max,*args)
+        
         s0_range = np.linspace(0,1)
         f_s = [func(state,*args) for state in s0_range]
         idx = 0
@@ -53,6 +56,9 @@ class IterativeMap:
         
         fig,ax = plt.subplots(1,3)
         ax[0].scatter([t for t in range(k_max)],s_vs_t)
+        if noise_scale:
+            s_vs_t_noisy = [s+np.random.normal(loc=0,scale=noise_scale) for s in s_vs_t]
+            ax[0].scatter([t for t in range(k_max)],s_vs_t_noisy)
         ax[1].plot(s0_range,s0_range)
         ax[1].plot(s0_range,f_s)
         ax[2].plot(s0_range,s0_range)
@@ -66,7 +72,7 @@ class IterativeMap:
         plt.tight_layout()
         return f_s
         
-    def state_plot(self,func,state_domain,param_domain,k,npts=50):
+    def state_plot(self,func,state_domain,param_domain,k,npts=50,noise_scale=0):
         s = np.linspace(state_domain[0],state_domain[1],num=npts)
         a = np.linspace(param_domain[0],param_domain[1],num=npts)
         S,A = np.meshgrid(s,a);
@@ -78,7 +84,12 @@ class IterativeMap:
         fig,ax = plt.subplots(subplot_kw={"projection":"3d"})
         
         surf = ax.plot_surface(S0,A,S,cmap=cm.plasma_r)
+        if noise_scale:
+            S_noisy = S + np.random.normal(loc=0,scale=noise_scale,size=S.shape)
+            surf_noisy = ax.plot_surface(S0,A,S_noisy,cmap=cm.coolwarm)
         ax.set_xlabel('s0')
         ax.set_ylabel('a')
         ax.set_zlabel('s({})'.format(k))
+        
+    #TODO: Add state plot that shows difference between two timesteps
     
